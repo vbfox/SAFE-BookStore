@@ -1,0 +1,11 @@
+/temp/
+/node_modules/
+/packages/
+/paket-files/
+/bin/
+/deploy/
+/.github/
+/.vscode/
+/.fake/
+**/bin/
+**/obj/

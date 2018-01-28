@@ -264,12 +264,12 @@ Target "BundleClient" (fun _ ->
     let publicDir = clientDir </> "public"
     let jsDir = clientDir </> "js"
     let cssDir = clientDir </> "css"
-    let imageDir = clientDir </> "Images"
+    let imageDir = clientDir </> "images"
 
     !! "src/Client/public/**/*.*" |> CopyFiles publicDir
     !! "src/Client/js/**/*.*" |> CopyFiles jsDir
     !! "src/Client/css/**/*.*" |> CopyFiles cssDir
-    !! "src/Client/Images/**/*.*" |> CopyFiles imageDir
+    !! "src/Client/images/**/*.*" |> CopyFiles imageDir
 
     "src/Client/index.html" |> CopyFile clientDir
 )
