@@ -35,7 +35,7 @@ type Msg =
     | WishListMsg of WishList.Msg
     | Logout of unit
 
-/// The navigation logic of the application given a page identity parsed from the .../#info 
+/// The navigation logic of the application given a page identity parsed from the .../#info
 /// information in the URL.
 let urlUpdate (result:Page option) model =
     match result with
@@ -75,7 +75,7 @@ let init result =
 
     urlUpdate result model
 
-let update msg model =
+let update model msg =
     match msg, model.PageModel with
     | StorageFailure e, _ ->
         printfn "Unable to access local storage: %A" e
@@ -99,7 +99,7 @@ let update msg model =
         { model with
             PageModel = WishListModel m }, cmd
 
-    | WishListMsg _, _ -> 
+    | WishListMsg _, _ ->
         model, Cmd.none
 
     | LoggedIn newUser, _ ->
@@ -109,7 +109,7 @@ let update msg model =
     | LoggedOut, _ ->
         { model with
             User = None
-            PageModel = HomePageModel }, 
+            PageModel = HomePageModel },
         Navigation.newUrl (toHash Page.Home)
 
     | Logout(), _ ->
@@ -122,24 +122,32 @@ open Fable.Helpers.React.Props
 open Client.Style
 
 /// Constructs the view for a page given the model and dispatcher.
-let viewPage model dispatch =
-    match model.PageModel with
-    | HomePageModel ->
-        Home.view ()
+let viewPage dispatch =
+    let dispatchLogin = LoginMsg >> dispatch
+    let dispatchWishListMsg = WishListMsg >> dispatch
 
-    | LoginModel m ->
-        [ Login.view m (LoginMsg >> dispatch) ]
+    fun model ->
+        match model.PageModel with
+        | HomePageModel ->
+            Home.view ()
 
-    | WishListModel m ->
-        [ WishList.view m (WishListMsg >> dispatch) ]
+        | LoginModel m ->
+            [ Login.view m dispatchLogin ]
+
+        | WishListModel m ->
+            [ WishList.view m dispatchWishListMsg ]
 
 /// Constructs the view for the application given the model.
-let view model dispatch =
-    div [] [ 
-        Menu.view (Logout >> dispatch) model.User
-        hr []
-        div [ centerStyle "column" ] (viewPage model dispatch)
-    ]
+let view dispatch =
+    let dispatchLogout = Logout >> dispatch
+    let viewPage = viewPage dispatch
+
+    fun model ->
+        div [] [
+            Menu.view dispatchLogout model.User
+            hr []
+            div [ centerStyle "column" ] (viewPage model)
+        ]
 
 open Elmish.React
 open Elmish.Debug
